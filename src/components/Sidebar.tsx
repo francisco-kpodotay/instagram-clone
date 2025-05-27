@@ -1,10 +1,25 @@
-import { Avatar, Box, Flex, Link, Tooltip } from "@chakra-ui/react";
+import { Avatar as ChakraAvatar, Box, Flex, Link, useBreakpointValue } from "@chakra-ui/react";
+
 import { Link as RouterLink } from "react-router-dom";
-import { CreatePostLogo, InstagramLogo, InstagramMobileLogo, NotificationsLogo, SearchLogo } from "../assets/constants";
+import {
+  CreatePostLogo,
+  InstagramLogo,
+  InstagramMobileLogo,
+  NotificationsLogo,
+  SearchLogo,
+} from "../assets/constants";
 import { BiLogOut } from "react-icons/bi";
 import { AiFillHome } from "react-icons/ai";
+import { Tooltip } from "./ui/tooltip";
 
 function Sidebar() {
+  /* TypeScript sees Chakra's Avatar as a namespace (due to how Chakra bundles types), 
+  which is not callable in JSX. Casting it as React.FC<any> bypasses the incorrect 
+  type resolution safely. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Avatar = ChakraAvatar as unknown as React.FC<any>;
+const shouldShowTooltip = useBreakpointValue({ base: true, md: false })
+
   const sidebarItems = [
     {
       icon: <AiFillHome size={25} />,
@@ -25,7 +40,7 @@ function Sidebar() {
       text: "Create",
     },
     {
-      icon: <Avatar size={"sm"} name="Burak Orkmez" src="/profilepic.png" />,
+      avatar: <Avatar size={"sm"} name="Burak Orkmez" src="/profilepic.png" />,
       text: "Profile",
       link: "/asaprogrammer",
     },
@@ -65,43 +80,50 @@ function Sidebar() {
           <InstagramMobileLogo />
         </Link>
 
-        <Flex direction={"column"} gap={5} cursor={"pointer"}>
-          {sidebarItems.map((item, index) => (
-            <Tooltip
-              key={index}
-              showArrow={true}
-              label={item.text}
-              placement="right"
-              ml={1}
-              openDelay={500}
-              display={{ base: "block", md: "none" }}
-            >
-              <Link
-                display={"flex"}
-                to={item.link || null}
-                as={RouterLink}
-                alignItems={"center"}
-                gap={4}
-                _hover={{ bg: "whiteAlpha.400" }}
-                borderRadius={6}
-                p={2}
-                w={{ base: 10, md: "full" }}
-                justifyContent={{ base: "center", md: "flex-start" }}
-              >
-                {item.icon}
-                <Box display={{ base: "none", md: "block" }}>{item.text}</Box>
-              </Link>
-            </Tooltip>
-          ))}
-        </Flex>
+        {
+          <Flex direction={"column"} gap={5} cursor={"pointer"}>
+            {sidebarItems.map((item, index) => {
+              return (
+                <Tooltip
+                  key={index}
+                  showArrow={true}
+                  content={item.text}
+                 positioning={{ placement: "right-end" }}
+                  /*  ml={1} */
+                  openDelay={500}
+                  disabled={!shouldShowTooltip}
+                >
+                  <Link
+                    display={"flex"}
+                    to={item.link || null}
+                    as={RouterLink}
+                    alignItems={"center"}
+                    gap={4}
+                    _hover={{ bg: "whiteAlpha.400" }}
+                    borderRadius={6}
+                    p={2}
+                    w={{ base: 10, md: "full" }}
+                    justifyContent={{ base: "center", md: "flex-start" }}
+                  >
+                   
+                    {item.icon}
+                    <Box display={{ base: "none", md: "block" }}>
+                      {item.text}
+                    </Box>
+                  </Link>
+                </Tooltip>
+              );
+            })}
+          </Flex>
+        }
 
         <Tooltip
           showArrow={true}
-          label={"Logout"}
-          placement="right"
-          ml={1}
+          content={"Logout"}
+          positioning={{ placement: "right-end" }}
+          /* ml={1} */
           openDelay={500}
-          display={{ base: "block", md: "none" }}
+          disabled={!shouldShowTooltip}
         >
           <Link
             display={"flex"}
